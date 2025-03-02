@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import Inscriptions from './inscriptions.entity';
 
 @Entity()
 export class User {
@@ -36,4 +37,7 @@ export class User {
     type: Date,
   })
   birthdate: Date;
+
+  @OneToMany(() => Inscriptions, (inscription) => inscription.user)
+  inscriptions: Inscriptions[];
 }
