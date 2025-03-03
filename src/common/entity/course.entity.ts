@@ -16,6 +16,8 @@ export default class Course {
   })
   previewImage: string;
 
-  @OneToMany(() => Module, (module) => module.course)
+  @OneToMany(() => Module, (module) => module.course, {
+    nullable: true,
+  })
   modules: Module[];
 }

@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { BDOptions } from './common/configs/DbOptions.configs';
 import { ConfigModule } from '@nestjs/config';
 import { CourseModule } from './course/course.module';
+import { ModuleModule } from './module/module.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { CourseModule } from './course/course.module';
       isGlobal: true,
     }),
     CourseModule,
+    ModuleModule,
   ],
   controllers: [],
   providers: [],

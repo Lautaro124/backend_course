@@ -16,6 +16,7 @@ export default class Module {
 
   @Column({
     type: String,
+    unique: true,
   })
   name: string;
 

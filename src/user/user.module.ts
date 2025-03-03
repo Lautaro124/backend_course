@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from 'src/common/entity/user.entitry';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserController } from './user.controller';
 import Inscriptions from 'src/common/entity/inscriptions.entity';
 import ModuleDb from 'src/common/entity/modules.entity';
 import Class from 'src/common/entity/class.entity';
@@ -20,7 +21,7 @@ import Course from 'src/common/entity/course.entity';
     ]),
   ],
   providers: [UserService],
-  controllers: [],
+  controllers: [UserController],
   exports: [UserService],
 })
 export class UserModule {}
