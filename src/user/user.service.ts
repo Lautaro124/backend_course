@@ -57,4 +57,10 @@ export class UserService {
 
     return updatedUser;
   }
+
+  getUserData(id: number) {
+    return this.userRepository.findOne({
+      where: { id },
+    });
+  }
 }

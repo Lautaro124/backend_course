@@ -14,10 +14,21 @@ export default class Course {
   @Column({
     type: String,
   })
+  shortDescription: string;
+
+  @Column({
+    type: String,
+  })
   previewImage: string;
 
   @OneToMany(() => Module, (module) => module.course, {
     nullable: true,
   })
   modules: Module[];
+
+  @Column({
+    type: Boolean,
+    default: false,
+  })
+  isPurchased: boolean;
 }

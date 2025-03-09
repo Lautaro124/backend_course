@@ -10,12 +10,21 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
+interface UserToken {
+  sub: number;
+  email: string;
+}
+
+interface AuthenticatedRequest extends Request {
+  user?: UserToken;
+}
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext) {
-    const request = context.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
@@ -23,7 +32,8 @@ export class AuthGuard implements CanActivate {
     }
 
     try {
-      await this.jwtService.verify(token);
+      const user: UserToken = await this.jwtService.verify(token);
+      request.user = user;
       return true;
     } catch (error) {
       console.error('🚀 ~ AuthGuard ~ error:', error);

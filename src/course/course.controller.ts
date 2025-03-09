@@ -14,7 +14,7 @@ export class CourseController {
   }
 
   @Get('all')
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   async findAll() {
     return await this.courseService.findAll();
   }
