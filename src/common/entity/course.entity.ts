@@ -1,5 +1,6 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, In, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import Module from './modules.entity';
+import Inscriptions from './inscriptions.entity';
 
 @Entity()
 export default class Course {

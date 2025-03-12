@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Module from 'src/common/entity/modules.entity';
 import { Repository } from 'typeorm';
+import { CreateModuleDto } from './dto/create-module.dto';
 
 @Injectable()
 export class ModuleService {
@@ -14,5 +15,9 @@ export class ModuleService {
       where: { course: { id: courseId } },
       relations: ['classes', 'course'],
     });
+  }
+
+  async createModule(module: CreateModuleDto) {
+    return await this.moduleRepository.save(module);
   }
 }

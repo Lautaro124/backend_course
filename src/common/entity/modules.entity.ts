@@ -30,10 +30,14 @@ export default class Module {
   })
   price: number;
 
-  @OneToMany(() => Class, (classEntity) => classEntity.module)
+  @OneToMany(() => Class, (classEntity) => classEntity.module, {
+    nullable: true,
+  })
   classes: Class[];
 
-  @OneToMany(() => Inscriptions, (inscription) => inscription.module)
+  @OneToMany(() => Inscriptions, (inscription) => inscription.module, {
+    nullable: true,
+  })
   inscriptions: Inscriptions[];
 
   @ManyToOne(() => Course, (course) => course.modules)

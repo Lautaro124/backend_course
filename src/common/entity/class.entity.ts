@@ -33,7 +33,9 @@ export default class Class {
   })
   videoUrl: string;
 
-  @OneToMany(() => Attachment, (attachment) => attachment.class)
+  @OneToMany(() => Attachment, (attachment) => attachment.class, {
+    nullable: true,
+  })
   attachments: Attachment[];
 
   @ManyToOne(() => Module, (module) => module.classes)

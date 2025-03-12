@@ -6,6 +6,7 @@ import { BDOptions } from './common/configs/DbOptions.configs';
 import { ConfigModule } from '@nestjs/config';
 import { CourseModule } from './course/course.module';
 import { ModuleModule } from './module/module.module';
+import { ClassModule } from './class/class.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ModuleModule } from './module/module.module';
     }),
     CourseModule,
     ModuleModule,
+    ClassModule,
   ],
   controllers: [],
   providers: [],
