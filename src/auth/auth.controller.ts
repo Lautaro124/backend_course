@@ -1,6 +1,18 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Res,
+} from '@nestjs/common';
 import { LoginDto, RegisterDto } from '../common/validators/auth.dto';
 import { AuthService } from './auth.service';
+import { Response } from 'express';
+import {
+  COOKIE_NAME,
+  COOKIE_OPTIONS,
+} from 'src/common/constants/auth.constants';
 
 @Controller('auth')
 export class AuthController {
@@ -8,15 +20,27 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  login(@Body() loginDto: LoginDto) {
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
     console.log('🚀 ~ AuthController ~ login ~ loginDto:', loginDto);
-    return this.authService.login(loginDto);
+    const { user, token } = await this.authService.login(loginDto);
+    response.cookie(COOKIE_NAME, token, COOKIE_OPTIONS);
+
+    return user;
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('register')
-  async register(@Body() registerDto: RegisterDto) {
+  async register(
+    @Body() registerDto: RegisterDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
     console.log('🚀 ~ AuthController ~ register ~ registerDto:', registerDto);
-    return await this.authService.register(registerDto);
+    const { user, token } = await this.authService.register(registerDto);
+    response.cookie(COOKIE_NAME, token, COOKIE_OPTIONS);
+
+    return user;
   }
 }

@@ -38,6 +38,8 @@ export class User {
   })
   birthdate: Date;
 
-  @OneToMany(() => Inscriptions, (inscription) => inscription.user)
+  @OneToMany(() => Inscriptions, (inscription) => inscription.user, {
+    nullable: true,
+  })
   inscriptions: Inscriptions[];
 }

@@ -1,6 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './user.entitry';
 import Module from './modules.entity';
+import Course from './course.entity';
 
 @Entity()
 export default class Inscriptions {
@@ -12,6 +13,9 @@ export default class Inscriptions {
 
   @ManyToOne(() => Module, (module) => module.inscriptions)
   module: Module;
+
+  @ManyToOne(() => Course, (course) => course.inscriptions)
+  course: Course;
 
   @Column({
     type: Date,
