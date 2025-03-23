@@ -10,9 +10,10 @@ export class ClassService {
     private classRepository: Repository<Class>,
   ) {}
 
-  async getClassesByModule(module: string) {
-    return this.classRepository.find({
+  async getClassesByModule(module: string, classId: string) {
+    return this.classRepository.findOne({
       where: {
+        id: parseInt(classId),
         module: { id: parseInt(module) },
       },
     });
