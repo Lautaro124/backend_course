@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Class from 'src/common/entity/class.entity';
-
+import { CreateClassDto } from './dto/create-class.dto';
 @Injectable()
 export class ClassService {
   constructor(
@@ -17,5 +17,10 @@ export class ClassService {
         module: { id: parseInt(module) },
       },
     });
+  }
+
+  async createClass(body: CreateClassDto) {
+    const classEntity = this.classRepository.create(body);
+    return this.classRepository.save(classEntity);
   }
 }

@@ -24,9 +24,8 @@ export class User {
   @Column({
     type: String,
     default: 'student',
-    nullable: true,
   })
-  role?: string;
+  role: string;
 
   @Column({
     type: String,

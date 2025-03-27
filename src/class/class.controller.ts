@@ -1,6 +1,7 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Post, UseGuards, Body } from '@nestjs/common';
 import { ClassService } from './class.service';
 import { AuthGuard } from '@nestjs/passport';
+import { CreateClassDto } from './dto/create-class.dto';
 
 @Controller('class')
 export class ClassController {
@@ -13,5 +14,11 @@ export class ClassController {
     @Param('class') className: string,
   ) {
     return this.classService.getClassesByModule(module, className);
+  }
+
+  @Post('create')
+  @UseGuards(AuthGuard('jwt'))
+  async createClass(@Body() body: CreateClassDto) {
+    return await this.classService.createClass(body);
   }
 }

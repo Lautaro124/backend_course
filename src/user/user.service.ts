@@ -63,4 +63,14 @@ export class UserService {
       where: { id },
     });
   }
+
+  getAllUsers() {
+    return this.userRepository.find();
+  }
+
+  generateLink(id: number) {
+    return this.userRepository.findOne({
+      where: { id },
+    });
+  }
 }

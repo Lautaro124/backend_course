@@ -13,7 +13,7 @@ export class ModuleController {
     return await this.moduleService.getModules(courseId);
   }
 
-  @Post()
+  @Post('create')
   @UseGuards(AuthGuard('jwt'))
   async createModule(@Body() module: CreateModuleDto) {
     return await this.moduleService.createModule(module);
