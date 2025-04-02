@@ -8,14 +8,14 @@ export default class Inscriptions {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.inscriptions)
-  user: User;
+  @ManyToOne(() => User, (user) => user.id)
+  userId: string;
 
-  @ManyToOne(() => Module, (module) => module.inscriptions)
-  module: Module;
+  @ManyToOne(() => Module, (module) => module.id)
+  moduleId: string;
 
-  @ManyToOne(() => Course, (course) => course.inscriptions)
-  course: Course;
+  @ManyToOne(() => Course, (course) => course.id)
+  courseId: string;
 
   @Column({
     type: Date,

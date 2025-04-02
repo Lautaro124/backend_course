@@ -1,6 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import Module from './modules.entity';
-import Inscriptions from './inscriptions.entity';
 
 @Entity()
 export default class Course {
@@ -32,9 +31,4 @@ export default class Course {
     default: false,
   })
   isPurchased: boolean;
-
-  @OneToMany(() => Inscriptions, (inscription) => inscription.course, {
-    nullable: true,
-  })
-  inscriptions: Inscriptions[];
 }

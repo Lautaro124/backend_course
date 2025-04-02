@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { CourseModule } from './course/course.module';
 import { ModuleModule } from './module/module.module';
 import { ClassModule } from './class/class.module';
+import { InscriptionsModule } from './inscriptions/inscriptions.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ClassModule } from './class/class.module';
     CourseModule,
     ModuleModule,
     ClassModule,
+    InscriptionsModule,
   ],
   controllers: [],
   providers: [],

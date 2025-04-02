@@ -6,7 +6,6 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import Class from './class.entity';
-import Inscriptions from './inscriptions.entity';
 import Course from './course.entity';
 
 @Entity()
@@ -34,11 +33,6 @@ export default class Module {
     nullable: true,
   })
   classes: Class[];
-
-  @OneToMany(() => Inscriptions, (inscription) => inscription.module, {
-    nullable: true,
-  })
-  inscriptions: Inscriptions[];
 
   @ManyToOne(() => Course, (course) => course.modules)
   course: Course;
