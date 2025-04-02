@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { LoginDto, RegisterDto } from '../common/validators/auth.dto';
@@ -10,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
@@ -43,7 +45,12 @@ export class AuthService {
         token: token,
       };
     } catch (error) {
-      console.error('🚀 ~ AuthService ~ register ~ error:', error);
+      if (error instanceof Error) {
+        this.logger.error(`Error registering user: ${error.message}`);
+      } else {
+        this.logger.error('Error registering user: Unknown error');
+      }
+
       throw new BadRequestException(error);
     }
   }
@@ -52,6 +59,7 @@ export class AuthService {
     try {
       const user = await this.userService.findUserByEmail(loginDto.email);
       if (!user) {
+        this.logger.warn(`User with email ${loginDto.email} not found`);
         throw new UnauthorizedException('Invalid credentials');
       }
 
@@ -60,6 +68,7 @@ export class AuthService {
         user.password,
       );
       if (!isPasswordValid) {
+        this.logger.warn(`Invalid password for user ${loginDto.email}`);
         throw new UnauthorizedException('Invalid credentials');
       }
       const token = await this.jwtService.signAsync({
@@ -71,7 +80,11 @@ export class AuthService {
         token: token,
       };
     } catch (error) {
-      console.error('🚀 ~ AuthService ~ login ~ error:', error);
+      if (error instanceof Error) {
+        this.logger.error(`Error logging in user: ${error.message}`);
+      } else {
+        this.logger.error('Error logging in user: Unknown error');
+      }
       throw new BadRequestException(error);
     }
   }

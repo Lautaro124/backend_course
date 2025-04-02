@@ -1,12 +1,17 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { ConsoleLogger, ValidationPipe } from '@nestjs/common';
 import * as session from 'express-session';
 import * as cookieParser from 'cookie-parser';
 import { COOKIE_OPTIONS } from './common/constants/auth.constants';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log', 'debug'],
+    logger: new ConsoleLogger({
+      timestamp: true,
+      context: 'Lidreazgo api',
+      logLevels: ['error', 'warn', 'log', 'debug', 'verbose'],
+    }),
   });
 
   app.use(
@@ -28,6 +33,14 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],
   });
+
+  const config = new DocumentBuilder()
+    .setTitle('Liderazgo api')
+    .setDescription('Api de curso de liderazgo')
+    .setVersion('1.0')
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/docs', app, documentFactory);
 
   await app.listen(process.env.PORT ?? 4000);
 }

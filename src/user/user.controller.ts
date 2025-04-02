@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Put, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ChangeEmailDto, UpdateUserDto } from './dto/update.dto';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -26,9 +35,11 @@ export class UserController {
     return await this.userService.getUserData(req.user.sub as number);
   }
 
-  @Get('all')
-  @UseGuards(AuthGuard('jwt'))
-  async getAllUsers() {
+  @Get('search')
+  async searchUser(@Query('name') name: string) {
+    if (name) {
+      return await this.userService.searchUser(name);
+    }
     return await this.userService.getAllUsers();
   }
 
