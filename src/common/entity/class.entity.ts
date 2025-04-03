@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
@@ -21,11 +22,6 @@ export default class Class {
   @Column({
     type: String,
   })
-  shortDescription: string;
-
-  @Column({
-    type: String,
-  })
   description: string;
 
   @Column({
@@ -40,4 +36,16 @@ export default class Class {
 
   @ManyToOne(() => Module, (module) => module.classes)
   module: Module;
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
 }

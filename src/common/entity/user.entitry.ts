@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import Inscriptions from './inscriptions.entity';
 
 @Entity()
 export class User {
@@ -35,4 +42,21 @@ export class User {
     type: Date,
   })
   birthdate: Date;
+
+  @OneToMany(() => Inscriptions, (inscription) => inscription.user, {
+    nullable: true,
+  })
+  inscriptions: Inscriptions[];
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
 }

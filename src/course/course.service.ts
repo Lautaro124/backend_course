@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateCourseDto } from './dto/create-course.dto';
 import Course from 'src/common/entity/course.entity';
+import Module from 'src/common/entity/modules.entity';
 
 @Injectable()
 export class CourseService {
@@ -11,8 +12,21 @@ export class CourseService {
     private courseRepository: Repository<Course>,
   ) {}
 
-  async createCourse(createCourseDto: CreateCourseDto) {
-    return await this.courseRepository.save(createCourseDto);
+  async createCourse(createCourseDto: CreateCourseDto): Promise<Course> {
+    const course = new Course();
+    course.title = createCourseDto.title;
+    course.description = createCourseDto.description;
+    course.previewImage = createCourseDto.previewImage;
+
+    course.modules = createCourseDto.modules.map((modDto) => {
+      const module = new Module();
+      module.name = modDto.name;
+      module.description = modDto.description;
+      module.price = modDto.price;
+      return module;
+    });
+
+    return await this.courseRepository.save(course);
   }
 
   async findAll() {

@@ -16,11 +16,6 @@ export class CreateClassDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  shortDescription: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
   description: string;
 
   @ApiProperty()

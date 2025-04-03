@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
@@ -7,6 +8,7 @@ import {
 } from 'typeorm';
 import Class from './class.entity';
 import Course from './course.entity';
+import Inscriptions from './inscriptions.entity';
 
 @Entity()
 export default class Module {
@@ -31,9 +33,28 @@ export default class Module {
 
   @OneToMany(() => Class, (classEntity) => classEntity.module, {
     nullable: true,
+    cascade: true,
   })
   classes: Class[];
 
-  @ManyToOne(() => Course, (course) => course.id)
-  courseId: string;
+  @ManyToOne(() => Course, (course) => course.modules)
+  course: Course;
+
+  @OneToMany(() => Inscriptions, (inscription) => inscription.module, {
+    nullable: true,
+    cascade: true,
+  })
+  inscriptions: Inscriptions[];
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @CreateDateColumn({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
 }
