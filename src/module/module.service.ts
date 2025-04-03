@@ -10,10 +10,11 @@ export class ModuleService {
     @InjectRepository(Module) private moduleRepository: Repository<Module>,
   ) {}
 
-  async getModules(courseId: number) {
+  async getModules(courseId: string) {
+    console.log('🚀 ~ ModuleService ~ getModules ~ courseId:', courseId);
     return await this.moduleRepository.find({
-      where: { course: { id: courseId } },
-      relations: ['classes', 'course'],
+      where: { courseId: courseId },
+      // relations: ['classes', 'courseId'],
     });
   }
 

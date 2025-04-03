@@ -11,4 +11,9 @@ export class CreateCourseDto {
   @IsNotEmpty()
   @IsString()
   previewImage: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  shortDescription: string;
 }

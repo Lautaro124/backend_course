@@ -9,7 +9,7 @@ export class ModuleController {
 
   @Get(':courseId')
   @UseGuards(AuthGuard('jwt'))
-  async getModules(@Param('courseId') courseId: number) {
+  async getModules(@Param('courseId') courseId: string) {
     return await this.moduleService.getModules(courseId);
   }
 

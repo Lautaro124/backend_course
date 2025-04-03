@@ -18,7 +18,7 @@ export class CreateModuleDto {
   price: number;
 
   @ApiProperty()
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  courseId: number;
+  courseId: string;
 }

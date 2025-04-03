@@ -21,14 +21,8 @@ export default class Course {
   })
   previewImage: string;
 
-  @OneToMany(() => Module, (module) => module.course, {
+  @OneToMany(() => Module, (module) => module.id, {
     nullable: true,
   })
-  modules: Module[];
-
-  @Column({
-    type: Boolean,
-    default: false,
-  })
-  isPurchased: boolean;
+  modules: number[];
 }

@@ -34,6 +34,6 @@ export default class Module {
   })
   classes: Class[];
 
-  @ManyToOne(() => Course, (course) => course.modules)
-  course: Course;
+  @ManyToOne(() => Course, (course) => course.id)
+  courseId: string;
 }
