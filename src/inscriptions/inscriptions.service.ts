@@ -37,8 +37,41 @@ export class InscriptionsService {
         );
         return [];
       }
+      const groupedCourses = {};
+      for (const inscription of inscriptions) {
+        const courseId = inscription.course.id;
 
-      return inscriptions;
+        if (!groupedCourses[courseId]) {
+          groupedCourses[courseId] = {
+            id: inscription.id,
+            user: {
+              id: inscription.user.id,
+              fullName: inscription.user.fullName,
+              email: inscription.user.email,
+            },
+            module: [],
+            course: {
+              id: inscription.course.id,
+              title: inscription.course.title,
+              description: inscription.course.description,
+              previewImage: inscription.course.previewImage,
+            },
+            date: inscription.date,
+            createdAt: inscription.createdAt,
+            updatedAt: inscription.updatedAt,
+          };
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        groupedCourses[courseId].module.push({
+          id: inscription.module.id,
+          name: inscription.module.name,
+          description: inscription.module.description,
+          price: inscription.module.price,
+        });
+      }
+
+      return Object.values(groupedCourses);
     } catch (error) {
       this.logger.error('Error al buscar inscripciones por userId', error);
       throw error;

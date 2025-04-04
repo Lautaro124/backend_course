@@ -35,6 +35,26 @@ export class UserService {
     }
   }
 
+  async getUserDetails(id: string) {
+    try {
+      const user = await this.userRepository.findOne({
+        where: { id: Number(id) },
+      });
+      if (!user) {
+        this.logger.warn(`User with id ${id} not found`);
+        return null;
+      }
+      return user;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        this.logger.error(`Error finding user by id: ${error.message}`);
+      } else {
+        this.logger.error('Error finding user by id: Unknown error');
+      }
+      throw new Error('Error finding user by id');
+    }
+  }
+
   async updateUserData(updateData: UpdateUserDto) {
     const user = await this.userRepository.findOne({
       where: { email: updateData.email },

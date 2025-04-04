@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Put,
   Query,
@@ -33,6 +34,16 @@ export class UserController {
   async getUserData(@Request() req) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     return await this.userService.getUserData(req.user.sub as number);
+  }
+
+  @Get('details/:id')
+  @UseGuards(AuthGuard('jwt'))
+  async getUserDetails(@Param('id') id: string) {
+    if (!id || id === 'undefined') {
+      return null;
+    }
+
+    return await this.userService.getUserDetails(id);
   }
 
   @Get('search')
