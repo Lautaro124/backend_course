@@ -1,9 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Inscriptions from 'src/common/entity/inscriptions.entity';
 import { Repository } from 'typeorm';
 import { CreateInscriptionDto } from './dto/create-incription.dto';
-import { UserService } from 'src/user/user.service';
+import { User } from 'src/common/entity/user.entitry';
+import Module from 'src/common/entity/modules.entity';
+import Course from 'src/common/entity/course.entity';
 
 @Injectable()
 export class InscriptionsService {
@@ -11,55 +13,72 @@ export class InscriptionsService {
   constructor(
     @InjectRepository(Inscriptions)
     private inscriptionsRepository: Repository<Inscriptions>,
-    private readonly userService: UserService,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    @InjectRepository(Module)
+    private moduleRepository: Repository<Module>,
+    @InjectRepository(Course)
+    private courseRepository: Repository<Course>,
   ) {}
 
-  // async create({ userId, courseId, moduleId }: CreateInscriptionDto) {
-  //   try {
-  //     this.logger.log('Creating a new inscription...');
-  //     const newInscription = new Inscriptions();
-  //     newInscription. = userId;
-  //     newInscription.courseId = courseId;
-  //     newInscription.moduleId = moduleId;
-  //     newInscription.date = new Date();
+  async findByEmail(email: string): Promise<Inscriptions[]> {
+    try {
+      const inscriptions = await this.inscriptionsRepository.find({
+        where: {
+          user: { email },
+        },
+        relations: ['user', 'module', 'course'],
+      });
+      if (!inscriptions || inscriptions.length === 0) {
+        this.logger.warn(
+          `No se encontraron inscripciones para el email: ${email}`,
+        );
+        throw new NotFoundException('No se encontraron inscripciones');
+      }
+      return inscriptions;
+    } catch (error) {
+      this.logger.error('Error al buscar inscripciones por email', error);
+      throw error;
+    }
+  }
 
-  //     return await this.inscriptionsRepository.save(newInscription);
-  //   } catch (error: unknown) {
-  //     if (error instanceof Error) {
-  //       this.logger.error(`Error creating inscription: ${error.message}`);
-  //     } else {
-  //       this.logger.error('Error creating inscription: Unknown error');
-  //     }
-  //     throw new Error('Error creating inscription');
-  //   }
-  // }
+  async createInscription(
+    createInscriptionDto: CreateInscriptionDto,
+  ): Promise<Inscriptions> {
+    const { userId, moduleId, courseId, date } = createInscriptionDto;
+    try {
+      const user = await this.userRepository.findOne({ where: { id: userId } });
+      if (!user) {
+        this.logger.error(`Usuario no encontrado: ${userId}`);
+        throw new NotFoundException('Usuario no encontrado');
+      }
 
-  // async findUserInscriptionByEmail(email: string) {
-  //   try {
-  //     this.logger.log(`Finding inscriptions for user with email: ${email}`);
-  //     const user = await this.userService.findUserByEmail(email);
-  //     if (!user) {
-  //       this.logger.warn(`User with email ${email} not found`);
-  //       return [];
-  //     }
-  //     const inscriptions = await this.inscriptionsRepository.find({
-  //       relations: ['userId', 'courseId', 'moduleId'],
-  //       where: { userId: user.id.toString() },
-  //     });
-  //     if (inscriptions.length === 0) {
-  //       this.logger.warn(`No inscriptions found for user with email: ${email}`);
-  //       return [];
-  //     }
-  //     return inscriptions;
-  //   } catch (error: unknown) {
-  //     if (error instanceof Error) {
-  //       this.logger.error(
-  //         `Error finding inscription by email: ${error.message}`,
-  //       );
-  //     } else {
-  //       this.logger.error('Error finding inscription by email: Unknown error');
-  //     }
-  //     throw new Error('Error finding inscription by email');
-  //   }
-  // }
+      const module = await this.moduleRepository.findOne({
+        where: { id: moduleId },
+      });
+      if (!module) {
+        this.logger.error(`Módulo no encontrado: ${moduleId}`);
+        throw new NotFoundException('Módulo no encontrado');
+      }
+
+      const course = await this.courseRepository.findOne({
+        where: { id: courseId },
+      });
+      if (!course) {
+        this.logger.error(`Curso no encontrado: ${courseId}`);
+        throw new NotFoundException('Curso no encontrado');
+      }
+
+      const inscription = new Inscriptions();
+      inscription.user = user;
+      inscription.module = module;
+      inscription.course = course;
+      inscription.date = date ? new Date(date) : new Date();
+
+      return await this.inscriptionsRepository.save(inscription);
+    } catch (error) {
+      this.logger.error('Error al crear la inscripción', error);
+      throw error;
+    }
+  }
 }

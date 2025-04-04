@@ -1,19 +1,32 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsDateString,
+} from 'class-validator';
 
 export class CreateInscriptionDto {
-  @ApiProperty()
-  @IsString()
+  @ApiProperty({ description: 'ID del usuario que se inscribe' })
   @IsNotEmpty()
-  userId: string;
+  @IsNumber()
+  userId: number;
 
-  @ApiProperty()
-  @IsString()
+  @ApiProperty({ description: 'ID del módulo al que se inscribe' })
   @IsNotEmpty()
-  courseId: string;
+  @IsNumber()
+  moduleId: number;
 
-  @ApiProperty()
-  @IsString()
+  @ApiProperty({ description: 'ID del curso al que se inscribe' })
   @IsNotEmpty()
-  moduleId: string;
+  @IsNumber()
+  courseId: number;
+
+  @ApiProperty({
+    description: 'Fecha de inscripción (opcional)',
+    required: false,
+  })
+  @IsOptional()
+  @IsDateString()
+  date?: string;
 }
