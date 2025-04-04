@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateCourseDto } from './dto/create-course.dto';
@@ -33,7 +33,7 @@ export class CourseService {
     try {
       const course = await this.courseRepository.find();
       if (!course) {
-        throw new Error('No courses found');
+        throw new NotFoundException('No courses found');
       }
       return course;
     } catch (error) {

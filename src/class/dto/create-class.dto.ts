@@ -1,29 +1,25 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 import { IsNotEmpty } from 'class-validator';
 
 export class CreateClassDto {
   @ApiProperty()
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   title: string;
 
   @ApiProperty()
-  @IsString()
   @IsNotEmpty()
-  moduleId: string;
-
-  @ApiProperty()
   @IsString()
-  @IsNotEmpty()
   description: string;
 
   @ApiProperty()
-  @IsString()
   @IsNotEmpty()
+  @IsString()
   videoUrl: string;
 
-  // @IsArray()
-  // @IsOptional()
-  // attachments?: Attachment[];
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsNumber()
+  moduleId: number;
 }

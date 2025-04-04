@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Module from 'src/common/entity/modules.entity';
 import { Repository } from 'typeorm';
@@ -15,7 +15,6 @@ export class ModuleService {
 
   async getModules(courseId: string) {
     try {
-      console.log('🚀 ~ ModuleService ~ getModules ~ courseId:', courseId);
       return await this.moduleRepository.find({
         where: {
           course: {
@@ -42,7 +41,7 @@ export class ModuleService {
       });
       if (!course) {
         this.logger.error(`Course with ID ${module.courseId} not found`);
-        throw new Error('Course not found');
+        throw new NotFoundException('Course not found');
       }
 
       const newModule = new Module();

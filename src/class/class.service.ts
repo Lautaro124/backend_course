@@ -1,13 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Class from 'src/common/entity/class.entity';
 import { CreateClassDto } from './dto/create-class.dto';
+import Module from 'src/common/entity/modules.entity';
 @Injectable()
 export class ClassService {
   constructor(
     @InjectRepository(Class)
-    private classRepository: Repository<Class>,
+    private readonly classRepository: Repository<Class>,
+    @InjectRepository(Module)
+    private readonly moduleRepository: Repository<Module>,
   ) {}
 
   async getClassesByModule(module: string, classId: string) {
@@ -19,8 +22,20 @@ export class ClassService {
     });
   }
 
-  async createClass(body: CreateClassDto) {
-    const classEntity = this.classRepository.create(body);
-    return this.classRepository.save(classEntity);
+  async createClass(createClassDto: CreateClassDto) {
+    const module = await this.moduleRepository.findOne({
+      where: { id: createClassDto.moduleId },
+    });
+    if (!module) {
+      throw new NotFoundException('Módulo no encontrado');
+    }
+
+    const newClass = new Class();
+    newClass.title = createClassDto.title;
+    newClass.description = createClassDto.description;
+    newClass.videoUrl = createClassDto.videoUrl;
+    newClass.module = module;
+
+    return this.classRepository.save(newClass);
   }
 }
