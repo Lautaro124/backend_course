@@ -17,10 +17,14 @@ export class InscriptionsController {
   constructor(private readonly inscriptionsService: InscriptionsService) {}
 
   @HttpCode(HttpStatus.OK)
-  @Get('user/:email')
+  @Get('user/:id')
   @UseGuards(AuthGuard('jwt'))
-  async getUserInscriptionByEmail(@Param('email') email: string) {
-    return await this.inscriptionsService.findByEmail(email);
+  async getUserInscriptionById(@Param('id') id?: string) {
+    if (!id || id === 'undefined') {
+      console.log('ID:', id);
+      return [];
+    }
+    return await this.inscriptionsService.findByUserId(Number(id));
   }
 
   @Post('create')

@@ -21,23 +21,26 @@ export class InscriptionsService {
     private courseRepository: Repository<Course>,
   ) {}
 
-  async findByEmail(email: string): Promise<Inscriptions[]> {
+  async findByUserId(userId: number): Promise<Inscriptions[]> {
     try {
       const inscriptions = await this.inscriptionsRepository.find({
         where: {
-          user: { email },
+          user: {
+            id: userId,
+          },
         },
         relations: ['user', 'module', 'course'],
       });
       if (!inscriptions || inscriptions.length === 0) {
         this.logger.warn(
-          `No se encontraron inscripciones para el email: ${email}`,
+          `No se encontraron inscripciones para el userId: ${userId}`,
         );
-        throw new NotFoundException('No se encontraron inscripciones');
+        return [];
       }
+
       return inscriptions;
     } catch (error) {
-      this.logger.error('Error al buscar inscripciones por email', error);
+      this.logger.error('Error al buscar inscripciones por userId', error);
       throw error;
     }
   }
