@@ -24,7 +24,7 @@ export class InscriptionsController {
       console.log('ID:', id);
       return [];
     }
-    return await this.inscriptionsService.findByUserId(Number(id));
+    return await this.inscriptionsService.findInscriptionByUsedId(Number(id));
   }
 
   @Post('create')

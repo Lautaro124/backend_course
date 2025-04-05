@@ -6,6 +6,7 @@ import { CreateInscriptionDto } from './dto/create-incription.dto';
 import { User } from 'src/common/entity/user.entitry';
 import Module from 'src/common/entity/modules.entity';
 import Course from 'src/common/entity/course.entity';
+import { ICourseWithModules } from './interface/responseFindByUserId.interface';
 
 @Injectable()
 export class InscriptionsService {
@@ -21,63 +22,47 @@ export class InscriptionsService {
     private courseRepository: Repository<Course>,
   ) {}
 
-  async findByUserId(userId: number): Promise<Inscriptions[]> {
+  async findInscriptionByUsedId(userId: number): Promise<ICourseWithModules[]> {
     try {
+      const courses = await this.courseRepository.find({
+        relations: ['modules'],
+      });
+
       const inscriptions = await this.inscriptionsRepository.find({
         where: {
           user: {
             id: userId,
           },
         },
-        relations: ['user', 'module', 'course'],
+        relations: ['module', 'course'],
       });
-      if (!inscriptions || inscriptions.length === 0) {
-        this.logger.warn(
-          `No se encontraron inscripciones para el userId: ${userId}`,
-        );
-        return [];
-      }
-      const groupedCourses = {};
-      for (const inscription of inscriptions) {
-        const courseId = inscription.course.id;
 
-        if (!groupedCourses[courseId]) {
-          groupedCourses[courseId] = {
-            id: inscription.id,
-            user: {
-              id: inscription.user.id,
-              fullName: inscription.user.fullName,
-              email: inscription.user.email,
-            },
-            module: [],
-            course: {
-              id: inscription.course.id,
-              title: inscription.course.title,
-              description: inscription.course.description,
-              previewImage: inscription.course.previewImage,
-            },
-            date: inscription.date,
-            createdAt: inscription.createdAt,
-            updatedAt: inscription.updatedAt,
-          };
-        }
+      const enrolledModules = new Set(
+        inscriptions.map((inscription) => inscription.module.id),
+      );
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        groupedCourses[courseId].module.push({
-          id: inscription.module.id,
-          name: inscription.module.name,
-          description: inscription.module.description,
-          price: inscription.module.price,
-        });
-      }
+      const enrolledCourses = new Set(
+        inscriptions.map((inscription) => inscription.course.id),
+      );
 
-      return Object.values(groupedCourses);
+      const result = courses.map((course) => ({
+        ...course,
+        isPushed: enrolledCourses.has(course.id),
+        modules: course.modules.map((module) => ({
+          ...module,
+          isPushed: enrolledModules.has(module.id),
+        })),
+      }));
+
+      return result;
     } catch (error) {
-      this.logger.error('Error al buscar inscripciones por userId', error);
+      this.logger.error(
+        'Error al obtener los cursos con estado de inscripción',
+        error,
+      );
       throw error;
     }
   }
-
   async createInscription(
     createInscriptionDto: CreateInscriptionDto,
   ): Promise<Inscriptions> {
