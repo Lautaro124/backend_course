@@ -27,7 +27,37 @@ export default class Inscriptions {
     type: Date,
     default: new Date(),
   })
-  date: Date;
+  enrolledDate: Date; // Renombrado de date a enrolledDate para consistencia
+
+  @Column({
+    type: 'int',
+    default: 0,
+  })
+  progress: number;
+
+  @Column({
+    type: Boolean,
+    default: false,
+  })
+  isFree: boolean;
+
+  @Column({
+    type: Boolean,
+    default: false,
+  })
+  isCompleted: boolean;
+
+  @Column({
+    type: Boolean,
+    default: false,
+  })
+  isInProgress: boolean;
+
+  @Column({
+    type: Boolean,
+    default: true,
+  })
+  isNotStarted: boolean;
 
   @CreateDateColumn({
     type: 'timestamp',

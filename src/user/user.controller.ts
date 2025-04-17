@@ -51,6 +51,10 @@ export class UserController {
     if (name) {
       return await this.userService.searchUser(name);
     }
+    console.log(
+      '🚀 ~ UserController ~ searchUser ~ await this.userService.getAllUsers():',
+      await this.userService.getAllUsers(),
+    );
     return await this.userService.getAllUsers();
   }
 

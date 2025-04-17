@@ -4,6 +4,12 @@ export interface ICourseWithModules {
   description: string;
   previewImage: string;
   isPushed: boolean;
+  enrolledDate?: Date;
+  progress?: number;
+  isFree?: boolean;
+  isCompleted?: boolean;
+  isInProgress?: boolean;
+  isNotStarted?: boolean;
   modules: IModuleWithStatus[];
 }
 
@@ -13,4 +19,10 @@ export interface IModuleWithStatus {
   description: string;
   price: number;
   isPushed: boolean;
+  enrolledDate?: Date;
+  progress?: number;
+  isFree?: boolean;
+  isCompleted?: boolean;
+  isInProgress?: boolean;
+  isNotStarted?: boolean;
 }

@@ -7,6 +7,8 @@ import { User } from 'src/common/entity/user.entitry';
 import Module from 'src/common/entity/modules.entity';
 import Course from 'src/common/entity/course.entity';
 import { ICourseWithModules } from './interface/responseFindByUserId.interface';
+import { CourseInfo } from './interface/courseInfo.interface';
+import { ModuleInfo } from './interface/moduleInfo.interface';
 
 @Injectable()
 export class InscriptionsService {
@@ -37,22 +39,89 @@ export class InscriptionsService {
         relations: ['module', 'course'],
       });
 
-      const enrolledModules = new Set(
-        inscriptions.map((inscription) => inscription.module.id),
-      );
+      const enrolledModules = new Map<number, ModuleInfo>();
+      const enrolledCourses = new Map<number, CourseInfo>();
 
-      const enrolledCourses = new Set(
-        inscriptions.map((inscription) => inscription.course.id),
-      );
+      inscriptions.forEach((inscription) => {
+        if (inscription.module) {
+          enrolledModules.set(inscription.module.id, {
+            enrolledDate: inscription.enrolledDate,
+            progress: inscription.progress,
+            isFree: inscription.isFree,
+            isCompleted: inscription.isCompleted,
+            isInProgress: inscription.isInProgress,
+            isNotStarted: inscription.isNotStarted,
+          });
+        }
 
-      const result = courses.map((course) => ({
-        ...course,
-        isPushed: enrolledCourses.has(course.id),
-        modules: course.modules.map((module) => ({
-          ...module,
-          isPushed: enrolledModules.has(module.id),
-        })),
-      }));
+        if (inscription.course) {
+          const existingCourseInfo = enrolledCourses.get(inscription.course.id);
+          const courseInfo: CourseInfo = existingCourseInfo || {
+            enrolledDate: inscription.enrolledDate,
+            progress: 0,
+            modules: 0,
+            completedModules: 0,
+            isFree: inscription.isFree,
+            isCompleted: inscription.isCompleted,
+            isInProgress: inscription.isInProgress,
+            isNotStarted: inscription.isNotStarted,
+          };
+
+          // Actualizar el progreso del curso basado en módulos
+          if (inscription.module) {
+            courseInfo.modules++;
+            if (inscription.isCompleted) {
+              courseInfo.completedModules++;
+            }
+          }
+
+          enrolledCourses.set(inscription.course.id, courseInfo);
+        }
+      });
+
+      enrolledCourses.forEach((value) => {
+        if (value.modules > 0) {
+          value.progress = Math.round(
+            (value.completedModules / value.modules) * 100,
+          );
+        }
+      });
+
+      const result = courses.map((course) => {
+        const courseInfo = enrolledCourses.get(course.id) || {
+          progress: 0,
+          modules: 0,
+          completedModules: 0,
+        };
+        const isPushed = enrolledCourses.has(course.id);
+
+        return {
+          ...course,
+          isPushed,
+          enrolledDate: courseInfo.enrolledDate,
+          progress: courseInfo.progress || 0,
+          isFree: courseInfo.isFree,
+          isCompleted: courseInfo.isCompleted,
+          isInProgress: courseInfo.isInProgress,
+          isNotStarted: courseInfo.isNotStarted,
+          modules: course.modules.map((module) => {
+            const moduleInfo = enrolledModules.get(module.id) || {};
+            return {
+              ...module,
+              isPushed: enrolledModules.has(module.id),
+              enrolledDate: moduleInfo.enrolledDate,
+              progress: moduleInfo.progress || 0,
+              isFree:
+                moduleInfo.isFree !== undefined
+                  ? moduleInfo.isFree
+                  : module.price === 0,
+              isCompleted: moduleInfo.isCompleted,
+              isInProgress: moduleInfo.isInProgress,
+              isNotStarted: moduleInfo.isNotStarted,
+            };
+          }),
+        };
+      });
 
       return result;
     } catch (error) {
@@ -63,10 +132,22 @@ export class InscriptionsService {
       throw error;
     }
   }
+
   async createInscription(
     createInscriptionDto: CreateInscriptionDto,
   ): Promise<Inscriptions> {
-    const { userId, moduleId, courseId, date } = createInscriptionDto;
+    const {
+      userId,
+      moduleId,
+      courseId,
+      enrolledDate,
+      progress,
+      isFree,
+      isCompleted,
+      isInProgress,
+      isNotStarted,
+    } = createInscriptionDto;
+
     try {
       const user = await this.userRepository.findOne({ where: { id: userId } });
       if (!user) {
@@ -90,11 +171,42 @@ export class InscriptionsService {
         throw new NotFoundException('Curso no encontrado');
       }
 
+      // Verificar si ya existe una inscripción para evitar duplicados
+      const existingInscription = await this.inscriptionsRepository.findOne({
+        where: {
+          user: { id: userId },
+          module: { id: moduleId },
+          course: { id: courseId },
+        },
+      });
+
+      if (existingInscription) {
+        this.logger.log(`La inscripción ya existe, actualizando datos`);
+        // Actualizar la inscripción existente
+        if (progress !== undefined) existingInscription.progress = progress;
+        if (isFree !== undefined) existingInscription.isFree = isFree;
+        if (isCompleted !== undefined)
+          existingInscription.isCompleted = isCompleted;
+        if (isInProgress !== undefined)
+          existingInscription.isInProgress = isInProgress;
+        if (isNotStarted !== undefined)
+          existingInscription.isNotStarted = isNotStarted;
+
+        return await this.inscriptionsRepository.save(existingInscription);
+      }
+
       const inscription = new Inscriptions();
       inscription.user = user;
       inscription.module = module;
       inscription.course = course;
-      inscription.date = date ? new Date(date) : new Date();
+      inscription.enrolledDate = enrolledDate
+        ? new Date(enrolledDate)
+        : new Date();
+      inscription.progress = progress ?? 0;
+      inscription.isFree = isFree ?? module.price === 0;
+      inscription.isCompleted = isCompleted ?? false;
+      inscription.isInProgress = isInProgress ?? false;
+      inscription.isNotStarted = isNotStarted ?? true;
 
       return await this.inscriptionsRepository.save(inscription);
     } catch (error) {
